@@ -3,6 +3,8 @@ import path from "path";
 import { wasm as wasm_tester } from "circom_tester";
 const relayerUtils = require("@zk-email/relayer-utils");
 import {
+    generateJWTAuthenticatorInputs,
+    generateJWTAuthenticatorWithAnonDomainsInputs,
     generateJWTVerifierInputs,
     RSAPublicKey,
 } from "../../helpers/src/input-generators";
@@ -15,6 +17,56 @@ import {
 } from "../../helpers/src/merkle-tree";
 
 describe("JWT Verifier Circuit", () => {
+    jest.setTimeout(10 * 60 * 1000); // 10 minutes
+    let circuit: any;
+    let header: any;
+    let payload: any;
+
+    beforeAll(async () => {
+        circuit = await wasm_tester(
+            path.join(__dirname, "./test-circuits/jwt-verifier-test.circom"),
+            {
+                recompile: true,
+                include: path.join(__dirname, "../../../node_modules"),
+                output: path.join(__dirname, "./compiled-test-circuits"),
+            }
+        );
+
+        header = {
+            alg: "RS256",
+            typ: "JWT",
+            kid: "5aaff47c21d06e266cce395b2145c7c6d4730ea5",
+        };
+
+        payload = {
+            iat: 1694989812,
+            iss: "accounts.google.com",
+        };
+    });
+
+    it("should verify a basic JWT", async () => {
+        const { rawJWT, publicKey } = generateJWT(header, payload);
+
+        const verifierInputs = await generateJWTVerifierInputs(
+            rawJWT,
+            publicKey,
+            {
+                maxMessageLength: 1024,
+            }
+        );
+
+        const witness = await circuit.calculateWitness(verifierInputs);
+        await circuit.checkConstraints(witness);
+
+        // Verify public key hash
+        const expectedPubKeyHash = relayerUtils.publicKeyHash(
+            "0x" + Buffer.from(publicKey.n, "base64").toString("hex")
+        );
+        expect(BigInt(expectedPubKeyHash)).toEqual(witness[1]);
+    });
+});
+
+describe("JWT Authenticator Circuit", () => {
     jest.setTimeout(10 * 60 * 1000); // 10 minutes
 
     let circuit: any;
@@ -29,7 +81,10 @@ describe("JWT Verifier Circuit", () => {
 
     beforeAll(async () => {
         circuit = await wasm_tester(
-            path.join(__dirname, "./test-circuits/jwt-verifier-test.circom"),
+            path.join(
+                __dirname,
+                "./test-circuits/jwt-authenticator-test.circom"
+            ),
             {
                 recompile: true,
                 include: path.join(__dirname, "../../../node_modules"),
@@ -65,7 +120,7 @@ describe("JWT Verifier Circuit", () => {
             nonce: "Send 0.1 ETH to alice@gmail.com",
         });
 
-        const jwtVerifierInputs = await generateJWTVerifierInputs(
+        const jwtVerifierInputs = await generateJWTAuthenticatorInputs(
             rawJWT,
             publicKey,
             accountCode,
@@ -184,7 +239,7 @@ describe("JWT Verifier Circuit", () => {
             nonce: "Swap 1 ETH to DAI",
         });
 
-        const jwtVerifierInputs = await generateJWTVerifierInputs(
+        const jwtVerifierInputs = await generateJWTAuthenticatorInputs(
             rawJWT,
             publicKey,
             accountCode,
@@ -305,7 +360,7 @@ describe("JWT Verifier Circuit", () => {
                 .slice(2)}`,
         });
 
-        const jwtVerifierInputs = await generateJWTVerifierInputs(
+        const jwtVerifierInputs = await generateJWTAuthenticatorInputs(
             rawJWT,
             publicKey,
             accountCode,
@@ -426,7 +481,7 @@ describe("JWT Verifier Circuit", () => {
                 .slice(2)}`,
         });
 
-        const jwtVerifierInputs = await generateJWTVerifierInputs(
+        const jwtVerifierInputs = await generateJWTAuthenticatorInputs(
             rawJWT,
             publicKey,
             accountCode,
@@ -554,7 +609,7 @@ describe("JWT Verifier Circuit", () => {
             n: googleSignInData.publicKeys.keys[1].n,
         };
 
-        const jwtVerifierInputs = await generateJWTVerifierInputs(
+        const jwtVerifierInputs = await generateJWTAuthenticatorInputs(
             rawJWT,
             publicKey,
             accountCode,
@@ -711,7 +766,7 @@ describe("Anonymous Email Domains", () => {
         circuit = await wasm_tester(
             path.join(
                 __dirname,
-                "./test-circuits/jwt-verifier-with-anon-email-domains-test.circom"
+                "./test-circuits/jwt-authenticator-with-anon-email-domains-test.circom"
             ),
             {
                 recompile: true,
@@ -750,19 +805,20 @@ describe("Anonymous Email Domains", () => {
             domains.indexOf("gmail.com")
         );
 
-        const jwtVerifierInputs = await generateJWTVerifierInputs(
-            rawJWT,
-            publicKey,
-            accountCode,
-            {
-                maxMessageLength: 1024,
-                verifyAnonymousDomains: true,
-                anonymousDomainsTreeHeight: 4,
-                anonymousDomainsTreeRoot: anonymousDomainsTree.getRoot(),
-                emailDomainPath: emailDomainProof.proof,
-                emailDomainPathHelper: emailDomainProof.pathIndices,
-            }
-        );
+        const jwtVerifierInputs =
+            await generateJWTAuthenticatorWithAnonDomainsInputs(
+                rawJWT,
+                publicKey,
+                accountCode,
+                {
+                    maxMessageLength: 1024,
+                    verifyAnonymousDomains: true,
+                    anonymousDomainsTreeHeight: 4,
+                    anonymousDomainsTreeRoot: anonymousDomainsTree.getRoot(),
+                    emailDomainPath: emailDomainProof.proof,
+                    emailDomainPathHelper: emailDomainProof.pathIndices,
+                }
+            );
 
         const witness = await circuit.calculateWitness(jwtVerifierInputs);
         await circuit.checkConstraints(witness);
