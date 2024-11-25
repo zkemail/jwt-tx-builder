@@ -5,7 +5,7 @@ import "../interfaces/IJwtGroth16Verifier.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {strings} from "solidity-stringutils/src/strings.sol";
-import {IVerifier, EmailProof} from "../interfaces/IVerifier.sol";
+import {IVerifier, JwtProof} from "../interfaces/IVerifier.sol";
 import {HexUtils} from "./HexUtils.sol";
 import {StringToArrayUtils} from "./StringToArrayUtils.sol";
 
@@ -35,9 +35,7 @@ contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
         groth16Verifier = IJwtGroth16Verifier(_groth16Verifier);
     }
 
-    function verifyEmailProof(
-        EmailProof memory proof
-    ) public view returns (bool) {
+    function verifyJwtProof(JwtProof memory proof) public view returns (bool) {
         (
             uint256[2] memory pA,
             uint256[2][2] memory pB,
