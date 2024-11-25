@@ -3,13 +3,13 @@ pragma solidity ^0.8.12;
 
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
-import {EmailProof, JwtVerifier} from "../../src/utils/JwtVerifier.sol";
+import {JwtProof, JwtVerifier} from "../../src/utils/JwtVerifier.sol";
 import {JwtGroth16Verifier} from "../../src/utils/JwtGroth16Verifier.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import {HexUtils} from "../../src/utils/HexUtils.sol";
 
-contract JwtVerifierTest_verifyEmailProof is Test {
+contract JwtVerifierTest_verifyjwtProof is Test {
     using Strings for *;
     using HexUtils for bytes32;
 
@@ -30,7 +30,7 @@ contract JwtVerifierTest_verifyEmailProof is Test {
         verifier = JwtVerifier(address(verifierProxy));
     }
 
-    function test_verifyEmailProof() public {
+    function test_verifyjwtProof() public {
         bytes32 accountCode = 0x1162ebff40918afe5305e68396f0283eb675901d0387f97d21928d423aaa0b54;
 
         // Verify the jwt proof
@@ -73,25 +73,25 @@ contract JwtVerifierTest_verifyEmailProof is Test {
         // isCodeExist -> pubSignals[30]
         bool isCodeExist = vm.parseUint(pubSignals[30]) == 1;
 
-        EmailProof memory emailProof;
+        JwtProof memory jwtProof;
 
-        emailProof.domainName = string(
+        jwtProof.domainName = string(
             abi.encodePacked(kidString, "|", iss, "|", azp)
         );
-        emailProof.publicKeyHash = publicKeyHash;
-        emailProof.timestamp = timeStamp;
-        emailProof.maskedCommand = maskedCommand;
-        emailProof.emailNullifier = jwtNullifier;
-        emailProof.accountSalt = accountSalt;
-        emailProof.isCodeExist = isCodeExist;
-        emailProof.proof = proofToBytes(
+        jwtProof.publicKeyHash = publicKeyHash;
+        jwtProof.timestamp = timeStamp;
+        jwtProof.maskedCommand = maskedCommand;
+        jwtProof.emailNullifier = jwtNullifier;
+        jwtProof.accountSalt = accountSalt;
+        jwtProof.isCodeExist = isCodeExist;
+        jwtProof.proof = proofToBytes(
             string.concat(
                 vm.projectRoot(),
                 "/test/build_integration/proof.json"
             )
         );
 
-        require(verifier.verifyEmailProof(emailProof) == true, "verify failed");
+        require(verifier.verifyJwtProof(jwtProof) == true, "verify failed");
     }
 
     function proofToBytes(
