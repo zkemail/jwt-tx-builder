@@ -6,7 +6,7 @@ struct JwtProof {
     bytes32 publicKeyHash; // Hash of the public key used in jwt
     uint timestamp; // Timestamp of the jwt
     string maskedCommand; // Masked command of the jwt
-    bytes32 emailNullifier; // Nullifier of the jwt to prevent its reuse.
+    bytes32 jwtNullifier; // Nullifier of the jwt to prevent its reuse.
     bytes32 accountSalt; // Create2 salt of the account
     bool isCodeExist; // Check if the account code is exist
     bytes proof; // ZK proof of jwt

@@ -59,7 +59,7 @@ contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
         // publicKeyHash;
         pubSignals[1 + ISS_FIELDS] = uint256(proof.publicKeyHash);
         // jwtNullifier;
-        pubSignals[1 + ISS_FIELDS + 1] = uint256(proof.emailNullifier);
+        pubSignals[1 + ISS_FIELDS + 1] = uint256(proof.jwtNullifier);
         // timestamp;
         pubSignals[1 + ISS_FIELDS + 2] = uint256(proof.timestamp);
 
