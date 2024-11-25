@@ -81,7 +81,7 @@ contract JwtVerifierTest_verifyjwtProof is Test {
         jwtProof.publicKeyHash = publicKeyHash;
         jwtProof.timestamp = timeStamp;
         jwtProof.maskedCommand = maskedCommand;
-        jwtProof.emailNullifier = jwtNullifier;
+        jwtProof.jwtNullifier = jwtNullifier;
         jwtProof.accountSalt = accountSalt;
         jwtProof.isCodeExist = isCodeExist;
         jwtProof.proof = proofToBytes(
