@@ -3,6 +3,7 @@ pragma solidity ^0.8.9;
 
 struct JwtProof {
     string domainName; // it contains iss and kid with the delimiter |
+    string azp; // The azp string
     bytes32 publicKeyHash; // Hash of the public key used in jwt
     uint timestamp; // Timestamp of the jwt
     string maskedCommand; // Masked command of the jwt
