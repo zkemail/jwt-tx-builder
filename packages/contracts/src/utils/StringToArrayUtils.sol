@@ -8,7 +8,7 @@ library StringToArrayUtils {
 
     /// @notice Converts a string containing three parts separated by '|' into an array of strings
     /// @param _strings The input string to be split
-    /// @return An array of three strings, representing kid and iss
+    /// @return An array of three strings, representing iss and kid
     /// @dev This function is used to parse the domainName parameter in other functions
     /// @dev Requires the input string to contain exactly two '|' characters
     function stringToArray(
@@ -20,7 +20,7 @@ library StringToArrayUtils {
         for (uint i = 0; i < parts.length; i++) {
             parts[i] = slicee.split(delim).toString();
         }
-        require(parts.length == 2, "Invalid kid|iss strings");
+        require(parts.length == 2, "Invalid iss|kid strings");
         return parts;
     }
 }

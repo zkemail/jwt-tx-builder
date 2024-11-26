@@ -48,8 +48,8 @@ contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
 
         uint256[ISS_FIELDS + COMMAND_FIELDS + AZP_FIELDS + 6] memory pubSignals;
 
-        // Split a string consisting of kid|iss|azp concatenated in domainName by stringToArray with | as delimiter
-        // string[] = [kid, iss]
+        // Split a string consisting of iss|kid concatenated in domainName by stringToArray with | as delimiter
+        // string[] = [iss, kid]
         string[] memory parts = proof.domainName.stringToArray();
 
         // kid

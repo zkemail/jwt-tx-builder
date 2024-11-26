@@ -78,8 +78,9 @@ contract JwtVerifierTest_verifyjwtProof is Test {
         JwtProof memory jwtProof;
 
         jwtProof.domainName = string(
-            abi.encodePacked(kidString, "|", iss, "|", azp)
+            abi.encodePacked(iss, "|", kidString)
         );
+        jwtProof.azp = azp;
         jwtProof.publicKeyHash = publicKeyHash;
         jwtProof.timestamp = timeStamp;
         jwtProof.maskedCommand = maskedCommand;

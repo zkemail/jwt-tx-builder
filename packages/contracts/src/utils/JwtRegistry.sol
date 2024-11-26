@@ -27,7 +27,7 @@ contract JwtRegistry is Ownable {
     }
 
     /// @notice Checks if a public key hash is valid and not revoked for a given kis and iss.
-    /// @param domainName The domain name contains kid and iss fields.
+    /// @param domainName The domain name contains iss and kid fields.
     /// @param publicKeyHash The public key hash to validate.
     /// @return bool Returns true if the public key hash is valid and not revoked, false otherwise.
     function isJwtPublicKeyHashValid(
@@ -42,7 +42,7 @@ contract JwtRegistry is Ownable {
     
     /// @notice Validates a JWT public key hash
     /// @dev This function is just a wrapper for isDKIMPublicKeyHashValid
-    /// @param domainName The domain name containing kid, iss, and azp fields
+    /// @param domainName The domain name containing iss and kid fields
     /// @param publicKeyHash The public key hash to validate
     /// @return bool Returns true if the public key hash is valid, false otherwise
     function isJwtPublicKeyValid(
@@ -54,7 +54,7 @@ contract JwtRegistry is Ownable {
 
     function updateJwtRegistry() public onlyOwner {
         // TODO Call ChainLink Function
-        // TODO Receive kid, iss, publicKeyHash
+        // TODO Receive iss, kid, publicKeyHash
 
         // Example implementation, we implement ChainLink Function later
         for(uint i = 0; i < 1; i++) {
