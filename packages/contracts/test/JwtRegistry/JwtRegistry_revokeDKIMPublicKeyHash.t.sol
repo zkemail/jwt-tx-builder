@@ -24,7 +24,7 @@ contract JwtRegistryTest_revokeDKIMPublicKeyHash is JwtRegistryTestBase {
 
     function testRevert_revokeDKIMPublicKeyHash_invalidPublicKeyHash() public {
         vm.startPrank(deployer);
-        string memory domainName = "12345|https://example.com|client-id-12345";
+        string memory domainName = "12345|https://example.com";
         vm.expectRevert(bytes("Invalid public key hash"));
         jwtRegistry.revokeDKIMPublicKeyHash(domainName, bytes32(0));
         vm.stopPrank();
@@ -32,7 +32,7 @@ contract JwtRegistryTest_revokeDKIMPublicKeyHash is JwtRegistryTestBase {
 
     function testRevert_revokeDKIMPublicKeyHash_publicKeyHashIsNotSet() public {
         vm.startPrank(deployer);
-        string memory domainName = "54321|https://example.com|client-id-12345";
+        string memory domainName = "54321|https://example.com";
         vm.expectRevert(bytes("publicKeyHash is not set"));
         jwtRegistry.revokeDKIMPublicKeyHash(domainName, publicKeyHash);
         vm.stopPrank();
@@ -42,7 +42,7 @@ contract JwtRegistryTest_revokeDKIMPublicKeyHash is JwtRegistryTestBase {
         public
     {
         vm.startPrank(vm.addr(2));
-        string memory domainName = "54321|https://example.com|client-id-12345";
+        string memory domainName = "54321|https://example.com";
         vm.expectRevert(
             abi.encodeWithSelector(
                 OwnableUpgradeable.OwnableUnauthorizedAccount.selector,
@@ -55,7 +55,7 @@ contract JwtRegistryTest_revokeDKIMPublicKeyHash is JwtRegistryTestBase {
 
     function test_revokeDKIMPublicKeyHash() public {
         vm.startPrank(deployer);
-        string memory domainName = "12345|https://example.com|client-id-12345";
+        string memory domainName = "12345|https://example.com";
         jwtRegistry.revokeDKIMPublicKeyHash(domainName, publicKeyHash);
         // revokeDKIMPublicKeyHash does not set azp to false
         assertEq(jwtRegistry.whitelistedClients("client-id-12345"), true);

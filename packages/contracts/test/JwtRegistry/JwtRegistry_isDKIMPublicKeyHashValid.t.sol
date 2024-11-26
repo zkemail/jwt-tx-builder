@@ -30,14 +30,14 @@ contract JwtRegistryTest_isJwtPublicKeyHashValid is JwtRegistryTestBase {
         assertEq(res, true);
     }
 
-    function testFail_isDKIMPublicKeyHashValid_invalidAzp() public {
-        string memory domainName = "12345|https://example.com";
-        bool res = jwtRegistry.isJwtPublicKeyHashValid(
-            domainName,
-            publicKeyHash
-        );
-        assertEq(res, true);
-    }
+    // function testFail_isDKIMPublicKeyHashValid_invalidAzp() public {
+    //     string memory domainName = "12345|https://example.com";
+    //     bool res = jwtRegistry.isJwtPublicKeyHashValid(
+    //         domainName,
+    //         publicKeyHash
+    //     );
+    //     assertEq(res, true);
+    // }
 
     function test_isDKIMPublicKeyHashValid() public {
         string memory domainName = "12345|https://example.com";

@@ -19,21 +19,22 @@ contract JwtRegistryTestBase is Test {
     constructor() {}
 
     function setUp() public virtual {
-        // Create jwt dkim registry
+        // Create jwt registry
         jwtRegistry = new JwtRegistry(deployer);
         vm.startPrank(deployer);
-        jwtRegistry.setJwtPublicKey(kidIssString, azpString, publicKeyHash);
+        jwtRegistry.updateJwtRegistry();
+        jwtRegistry.whitelistAzp(azpString);
         vm.stopPrank();
 
         bool isRegistered = jwtRegistry.isJwtPublicKeyHashValid(
             kidIssString,
             publicKeyHash
         );
-        assertTrue(isRegistered, "DKIM Public Key Hash should be registered");
+        assertTrue(isRegistered, "JWT Public Key Hash should be registered");
         isRegistered = jwtRegistry.isJwtPublicKeyValid(
             kidIssString,
             publicKeyHash
         );
-        assertTrue(isRegistered, "DKIM Public Key Hash should be registered");
+        assertTrue(isRegistered, "JWT Public Key Hash should be registered");
     }
 }
