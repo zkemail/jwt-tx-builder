@@ -100,7 +100,7 @@ contract JwtRegistry is Ownable {
 
     function whitelistAzp(
         string memory azp
-    ) public onlyOwner(){
+    ) public onlyOwner {
         whitelistedClients[azp] = true;
     }
 
