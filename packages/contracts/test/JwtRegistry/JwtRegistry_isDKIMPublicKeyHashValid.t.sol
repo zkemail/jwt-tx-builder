@@ -13,7 +13,7 @@ contract JwtRegistryTest_isJwtPublicKeyHashValid is JwtRegistryTestBase {
     }
 
     function testFail_isJwtPublicKeyHashValid_invalidKid() public {
-        string memory domainName = "54321|https://example.com";
+        string memory domainName = "https://example.com|54321";
         bool res = jwtRegistry.isJwtPublicKeyHashValid(
             domainName,
             publicKeyHash
@@ -22,7 +22,7 @@ contract JwtRegistryTest_isJwtPublicKeyHashValid is JwtRegistryTestBase {
     }
 
     function testFail_isDKIMPublicKeyHashValid_invalidIss() public {
-        string memory domainName = "12345|https://example.xyz";
+        string memory domainName = "https://example.xyz|12345";
         bool res = jwtRegistry.isJwtPublicKeyHashValid(
             domainName,
             publicKeyHash
@@ -30,17 +30,8 @@ contract JwtRegistryTest_isJwtPublicKeyHashValid is JwtRegistryTestBase {
         assertEq(res, true);
     }
 
-    // function testFail_isDKIMPublicKeyHashValid_invalidAzp() public {
-    //     string memory domainName = "12345|https://example.com";
-    //     bool res = jwtRegistry.isJwtPublicKeyHashValid(
-    //         domainName,
-    //         publicKeyHash
-    //     );
-    //     assertEq(res, true);
-    // }
-
     function test_isDKIMPublicKeyHashValid() public {
-        string memory domainName = "12345|https://example.com";
+        string memory domainName = "https://example.com|12345";
         bool res = jwtRegistry.isJwtPublicKeyHashValid(
             domainName,
             publicKeyHash
