@@ -91,9 +91,9 @@ contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
             ? 1
             : 0;
 
-        // Check JwtRegistry
+        // Check JwtRegistry, if it returns false, then call updateJwtRegistry
         if (
-            jwtRegistry.isJwtPublicKeyValid(
+            !jwtRegistry.isJwtPublicKeyValid(
                 proof.domainName,
                 proof.publicKeyHash
             )
