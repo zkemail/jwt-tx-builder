@@ -9,7 +9,7 @@ import {JwtRegistryTestBase} from "./JwtRegistryBase.t.sol";
 contract JwtRegistryTestBase is Test {
     bytes32 publicKeyHash =
         0x0ea9c777dc7110e5a9e89b13f0cfc540e3845ba120b2b6dc24024d61488d4788;
-    string kidIssString = "https://example.com|12345";
+    string issKidString = "https://example.com|12345";
     string azpString = "client-id-12345";
     
     JwtRegistry jwtRegistry;
@@ -27,12 +27,12 @@ contract JwtRegistryTestBase is Test {
         vm.stopPrank();
 
         bool isRegistered = jwtRegistry.isJwtPublicKeyHashValid(
-            kidIssString,
+            issKidString,
             publicKeyHash
         );
         assertTrue(isRegistered, "JWT Public Key Hash should be registered");
         isRegistered = jwtRegistry.isJwtPublicKeyValid(
-            kidIssString,
+            issKidString,
             publicKeyHash
         );
         assertTrue(isRegistered, "JWT Public Key Hash should be registered");
