@@ -13,7 +13,7 @@ import {StringToArrayUtils} from "./StringToArrayUtils.sol";
 /// @title JWT Registry
 /// @notice TODO
 /// @dev TODO
-contract JwtRegistry is IDKIMRegistry, Ownable {
+contract JwtRegistry is Ownable {
     using strings for *;
     using StringToArrayUtils for string;
 
@@ -27,18 +27,23 @@ contract JwtRegistry is IDKIMRegistry, Ownable {
     }
 
     /// @notice Checks if a public key hash is valid and not revoked for a given kis and iss.
-    /// @param domainName The domain name contains kis, iss and azp fields.
+    /// @param domainName The domain name contains kid and iss fields.
     /// @param publicKeyHash The public key hash to validate.
     /// @return bool Returns true if the public key hash is valid and not revoked, false otherwise.
-    function isDKIMPublicKeyHashValid(
+    function isJwtPublicKeyHashValid(
         string memory domainName,
         bytes32 publicKeyHash
     ) public view returns (bool) {
         string[] memory parts = domainName.stringToArray();
         string memory kidAndIss = string(abi.encode(parts[0], "|", parts[1]));
         return
-            dkimRegistry.isDKIMPublicKeyHashValid(kidAndIss, publicKeyHash) &&
-            whitelistedClients[parts[2]];
+            dkimRegistry.isDKIMPublicKeyHashValid(kidAndIss, publicKeyHash);
+    }
+
+    function isAzpWhitelisted(
+        string memory azp
+    ) public view returns (bool) {
+        return whitelistedClients[azp];
     }
 
     /// @notice Validates a JWT public key hash
@@ -50,7 +55,7 @@ contract JwtRegistry is IDKIMRegistry, Ownable {
         string memory domainName,
         bytes32 publicKeyHash
     ) public view returns (bool) {
-        return this.isDKIMPublicKeyHashValid(domainName, publicKeyHash);
+        return this.isJwtPublicKeyHashValid(domainName, publicKeyHash);
     }
 
     /// @notice Sets a public key hash for a `kis|iss` string  after validating the provided signature.
@@ -59,6 +64,7 @@ contract JwtRegistry is IDKIMRegistry, Ownable {
     /// @dev This function requires that the public key hash is not already set or revoked.
     function setJwtPublicKey(
         string memory domainName,
+        string memory azp,
         bytes32 publicKeyHash
     ) public onlyOwner {
         require(bytes(domainName).length != 0, "Invalid domain name");
@@ -66,7 +72,7 @@ contract JwtRegistry is IDKIMRegistry, Ownable {
         string[] memory parts = domainName.stringToArray();
         string memory kidAndIss = string(abi.encode(parts[0], "|", parts[1]));
         require(
-            isDKIMPublicKeyHashValid(domainName, publicKeyHash) == false,
+            isJwtPublicKeyHashValid(domainName, publicKeyHash) == false,
             "publicKeyHash is already set"
         );
         require(
@@ -76,7 +82,7 @@ contract JwtRegistry is IDKIMRegistry, Ownable {
 
         dkimRegistry.setDKIMPublicKeyHash(kidAndIss, publicKeyHash);
         // Register azp
-        whitelistedClients[parts[2]] = true;
+        whitelistedClients[azp] = true;
     }
 
     /// @notice Revokes a public key hash for `kis|iss` string after validating the provided signature.
@@ -90,7 +96,7 @@ contract JwtRegistry is IDKIMRegistry, Ownable {
         require(bytes(domainName).length != 0, "Invalid domain name");
         require(publicKeyHash != bytes32(0), "Invalid public key hash");
         require(
-            isDKIMPublicKeyHashValid(domainName, publicKeyHash) == true,
+            isJwtPublicKeyHashValid(domainName, publicKeyHash) == true,
             "publicKeyHash is not set"
         );
         require(
