@@ -13,25 +13,25 @@ contract JwtRegistryTest_isJwtPublicKeyValid is JwtRegistryTestBase {
     }
 
     function testFail_isJwtPublicKeyValid_invalidKid() public {
-        string memory domainName = "54321|https://example.com|client-id-12345";
+        string memory domainName = "54321|https://example.com";
         bool res = jwtRegistry.isJwtPublicKeyValid(domainName, publicKeyHash);
         assertEq(res, true);
     }
 
     function testFail_isJwtPublicKeyValid_invalidIss() public {
-        string memory domainName = "12345|https://example.xyz|client-id-12345";
+        string memory domainName = "12345|https://example.xyz";
         bool res = jwtRegistry.isJwtPublicKeyValid(domainName, publicKeyHash);
         assertEq(res, true);
     }
 
-    function testFail_isJwtPublicKeyValid_invalidAzp() public {
-        string memory domainName = "12345|https://example.com|client-id-54321";
-        bool res = jwtRegistry.isJwtPublicKeyValid(domainName, publicKeyHash);
-        assertEq(res, true);
-    }
+    // function testFail_isJwtPublicKeyValid_invalidAzp() public {
+    //     string memory domainName = "12345|https://example.com|client-id-54321";
+    //     bool res = jwtRegistry.isJwtPublicKeyValid(domainName, publicKeyHash);
+    //     assertEq(res, true);
+    // }
 
     function test_isJwtPublicKeyValid() public {
-        string memory domainName = "12345|https://example.com|client-id-12345";
+        string memory domainName = "12345|https://example.com";
         bool res = jwtRegistry.isJwtPublicKeyValid(domainName, publicKeyHash);
         assertEq(res, true);
     }
