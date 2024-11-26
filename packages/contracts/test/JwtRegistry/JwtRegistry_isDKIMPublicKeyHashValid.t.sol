@@ -5,16 +5,16 @@ import "forge-std/Test.sol";
 import "forge-std/console.sol";
 import {JwtRegistryTestBase} from "./JwtRegistryBase.t.sol";
 
-contract JwtRegistryTest_isDKIMPublicKeyHashValid is JwtRegistryTestBase {
+contract JwtRegistryTest_isJwtPublicKeyHashValid is JwtRegistryTestBase {
     constructor() {}
 
     function setUp() public override {
         super.setUp();
     }
 
-    function testFail_isDKIMPublicKeyHashValid_invalidKid() public {
-        string memory domainName = "54321|https://example.com|client-id-12345";
-        bool res = jwtRegistry.isDKIMPublicKeyHashValid(
+    function testFail_isJwtPublicKeyHashValid_invalidKid() public {
+        string memory domainName = "54321|https://example.com";
+        bool res = jwtRegistry.isJwtPublicKeyHashValid(
             domainName,
             publicKeyHash
         );
@@ -22,8 +22,8 @@ contract JwtRegistryTest_isDKIMPublicKeyHashValid is JwtRegistryTestBase {
     }
 
     function testFail_isDKIMPublicKeyHashValid_invalidIss() public {
-        string memory domainName = "12345|https://example.xyz|client-id-12345";
-        bool res = jwtRegistry.isDKIMPublicKeyHashValid(
+        string memory domainName = "12345|https://example.xyz";
+        bool res = jwtRegistry.isJwtPublicKeyHashValid(
             domainName,
             publicKeyHash
         );
@@ -31,8 +31,8 @@ contract JwtRegistryTest_isDKIMPublicKeyHashValid is JwtRegistryTestBase {
     }
 
     function testFail_isDKIMPublicKeyHashValid_invalidAzp() public {
-        string memory domainName = "12345|https://example.com|client-id-54321";
-        bool res = jwtRegistry.isDKIMPublicKeyHashValid(
+        string memory domainName = "12345|https://example.com";
+        bool res = jwtRegistry.isJwtPublicKeyHashValid(
             domainName,
             publicKeyHash
         );
@@ -40,8 +40,8 @@ contract JwtRegistryTest_isDKIMPublicKeyHashValid is JwtRegistryTestBase {
     }
 
     function test_isDKIMPublicKeyHashValid() public {
-        string memory domainName = "12345|https://example.com|client-id-12345";
-        bool res = jwtRegistry.isDKIMPublicKeyHashValid(
+        string memory domainName = "12345|https://example.com";
+        bool res = jwtRegistry.isJwtPublicKeyHashValid(
             domainName,
             publicKeyHash
         );

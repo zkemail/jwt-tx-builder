@@ -16,38 +16,42 @@ contract JwtRegistryTest_setJwtPublicKey is JwtRegistryTestBase {
 
     function testRevert_setJwtPublicKey_publicKeyHashIsAlreadySet() public {
         vm.startPrank(deployer);
-        string memory domainName = "12345|https://example.com|client-id-12345";
+        string memory domainName = "12345|https://example.com";
+        string memory azpString = "client-id-12345";
         vm.expectRevert(bytes("publicKeyHash is already set"));
-        jwtRegistry.setJwtPublicKey(domainName, publicKeyHash);
+        jwtRegistry.setJwtPublicKey(domainName, azpString, publicKeyHash);
         vm.stopPrank();
     }
 
     function testRevert_setJwtPublicKey_publicKeyHashIsRevoked() public {
         vm.startPrank(deployer);
-        string memory domainName = "12345|https://example.com|client-id-12345";
+        string memory domainName = "12345|https://example.com";
+        string memory azpString = "client-id-12345";
         jwtRegistry.revokeDKIMPublicKeyHash(domainName, publicKeyHash);
         vm.expectRevert(bytes("publicKeyHash is revoked"));
-        jwtRegistry.setJwtPublicKey(domainName, publicKeyHash);
+        jwtRegistry.setJwtPublicKey(domainName, azpString, publicKeyHash);
         vm.stopPrank();
     }
 
     function testRevert_setJwtPublicKey_OwnableUnauthorizedAccount() public {
         vm.startPrank(vm.addr(2));
-        string memory domainName = "12345|https://example.com|client-id-12345";
+        string memory domainName = "12345|https://example.com";
+        string memory azpString = "client-id-12345";
         vm.expectRevert(
             abi.encodeWithSelector(
                 OwnableUpgradeable.OwnableUnauthorizedAccount.selector,
                 vm.addr(2)
             )
         );
-        jwtRegistry.setJwtPublicKey(domainName, publicKeyHash);
+        jwtRegistry.setJwtPublicKey(domainName, azpString, publicKeyHash);
         vm.stopPrank();
     }
 
     function test_setJwtPublicKey() public {
         vm.startPrank(deployer);
-        string memory domainName = "12345|https://example.xyz|client-id-12345";
-        jwtRegistry.setJwtPublicKey(domainName, publicKeyHash);
+        string memory domainName = "12345|https://example.xyz";
+        string memory azpString = "client-id-12345";
+        jwtRegistry.setJwtPublicKey(domainName, azpString, publicKeyHash);
         assertEq(jwtRegistry.whitelistedClients("client-id-12345"), true);
         vm.stopPrank();
     }
