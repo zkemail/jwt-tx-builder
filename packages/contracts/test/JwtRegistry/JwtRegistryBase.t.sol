@@ -20,8 +20,9 @@ contract JwtRegistryTestBase is Test {
 
     function setUp() public virtual {
         // Create jwt registry
-        jwtRegistry = new JwtRegistry(deployer);
         vm.startPrank(deployer);
+        jwtRegistry = new JwtRegistry(deployer);
+
         // TODO Call ChainLink Function, currently it's not implemented yet
         // jwtRegistry.updateJwtRegistry();
         jwtRegistry.setJwtPublicKey(issKidString, publicKeyHash);

@@ -16,10 +16,27 @@ contract JwtVerifierTest_verifyjwtProof is Test {
 
     JwtVerifier verifier;
 
+    address deployer = vm.addr(1);
+
     constructor() {}
 
     function setUp() public {
-        JwtRegistry jwtRegistry = new JwtRegistry(msg.sender);
+        bytes32 publicKeyHash =
+            0x026fe6cf02399716650c42f1b9aaa9d71f2383392e217314198dfeb7208325d7;
+        string memory issKidString = "random.website.com|5aaff47c21d06e266cce395b2145c7c6d4730ea5";
+        string memory azpString = "demo-client-id";
+
+        vm.startPrank(deployer);
+        JwtRegistry jwtRegistry = new JwtRegistry(deployer);
+        jwtRegistry.setJwtPublicKey(issKidString, publicKeyHash);
+        jwtRegistry.whitelistAzp(azpString);
+
+        // Check if the publicKeyHash is registered
+        require(
+            jwtRegistry.isJwtPublicKeyValid(issKidString, publicKeyHash),
+            "JWT Public Key Hash should be registered"
+        );
+
         JwtVerifier verifierImpl = new JwtVerifier();
         JwtGroth16Verifier groth16Verifier = new JwtGroth16Verifier();
         ERC1967Proxy verifierProxy = new ERC1967Proxy(
@@ -30,6 +47,7 @@ contract JwtVerifierTest_verifyjwtProof is Test {
             )
         );
         verifier = JwtVerifier(address(verifierProxy));
+        vm.stopPrank();
     }
 
     function test_verifyjwtProof() public {

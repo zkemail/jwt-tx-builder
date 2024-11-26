@@ -9,6 +9,7 @@ import {IVerifier, JwtProof} from "../interfaces/IVerifier.sol";
 import {HexUtils} from "./HexUtils.sol";
 import {StringToArrayUtils} from "./StringToArrayUtils.sol";
 import {JwtRegistry} from "./JwtRegistry.sol";
+import "forge-std/console.sol";
 
 contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
     using strings for *;
@@ -52,8 +53,10 @@ contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
         // string[] = [iss, kid]
         string[] memory parts = proof.domainName.stringToArray();
 
+        console.log("kid");
         // kid
         pubSignals[0] = uint256(parts[1].hexStringToBytes32());
+        console.log("iss");
         // iss
         uint256[] memory stringFields;
         stringFields = _packBytes2Fields(bytes(parts[0]), ISS_BYTES);
@@ -80,7 +83,7 @@ contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
             proof.accountSalt
         );
         // azp
-        stringFields = _packBytes2Fields(bytes(parts[2]), AZP_BYTES);
+        stringFields = _packBytes2Fields(bytes(proof.azp), AZP_BYTES);
         for (uint256 i = 0; i < AZP_FIELDS; i++) {
             pubSignals[
                 1 + ISS_FIELDS + 3 + COMMAND_FIELDS + 1 + i
@@ -91,7 +94,9 @@ contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
             ? 1
             : 0;
 
-        // Check JwtRegistry, if it returns false, then call updateJwtRegistry
+        // Check JwtRegistry, 
+        // if it returns false, then call updateJwtRegistry, 
+        // and then try isJwtPublicKeyValid again.
         if (
             !jwtRegistry.isJwtPublicKeyValid(
                 proof.domainName,
@@ -99,14 +104,14 @@ contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
             )
         ) {
             jwtRegistry.updateJwtRegistry();
+            require(
+                jwtRegistry.isJwtPublicKeyValid(
+                    proof.domainName,
+                    proof.publicKeyHash
+                ),
+                "Invalid public key hash"
+            );
         }
-        require(
-            jwtRegistry.isJwtPublicKeyValid(
-                proof.domainName,
-                proof.publicKeyHash
-            ),
-            "Invalid public key hash"
-        );
         // Check if azp is in whitelist
         require(
             jwtRegistry.isAzpWhitelisted(proof.azp),
