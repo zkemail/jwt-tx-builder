@@ -17,9 +17,9 @@ contract JwtRegistryTest_stringToArray is JwtRegistryTestBase {
     }
 
     function test_stringToArray() public {
-        string memory domainName = "12345|https://example.com";
+        string memory domainName = "https://example.com|12345";
         string[] memory points = domainName.stringToArray();
-        assertEq(points[0], "12345");
-        assertEq(points[1], "https://example.com");
+        assertEq(points[0], "https://example.com");
+        assertEq(points[1], "12345");        
     }
 }

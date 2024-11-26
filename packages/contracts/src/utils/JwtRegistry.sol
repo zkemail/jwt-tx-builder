@@ -35,9 +35,9 @@ contract JwtRegistry is Ownable {
         bytes32 publicKeyHash
     ) public view returns (bool) {
         string[] memory parts = domainName.stringToArray();
-        string memory kidAndIss = string(abi.encodePacked(parts[0], "|", parts[1]));
+        string memory issAndKid = string(abi.encodePacked(parts[0], "|", parts[1]));
         return
-            dkimRegistry.isDKIMPublicKeyHashValid(kidAndIss, publicKeyHash);
+            dkimRegistry.isDKIMPublicKeyHashValid(issAndKid, publicKeyHash);
     }
     
     /// @notice Validates a JWT public key hash
@@ -58,15 +58,15 @@ contract JwtRegistry is Ownable {
 
         // Example implementation, we implement ChainLink Function later
         for(uint i = 0; i < 1; i++) {
-            string memory kidAndIss = "12345|https://example.com";
+            string memory issAndKid = "https://example.com|12345";
             bytes32 publicKeyHash = 0x0ea9c777dc7110e5a9e89b13f0cfc540e3845ba120b2b6dc24024d61488d4788;
-            if(isJwtPublicKeyHashValid(kidAndIss, publicKeyHash)){
+            if(isJwtPublicKeyHashValid(issAndKid, publicKeyHash)){
                 continue;
             }
             if(dkimRegistry.revokedDKIMPublicKeyHashes(publicKeyHash)){
                 continue;
             }
-            dkimRegistry.setDKIMPublicKeyHash(kidAndIss, publicKeyHash);    
+            dkimRegistry.setDKIMPublicKeyHash(issAndKid, publicKeyHash);    
         }
     }
 

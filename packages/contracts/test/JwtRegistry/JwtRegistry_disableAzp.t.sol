@@ -41,14 +41,14 @@ contract JwtRegistryTest_disableAzp is JwtRegistryTestBase {
 
     function testRevert_disableAzp_OwnableUnauthorizedAccount() public {
         vm.startPrank(vm.addr(2));
-        string memory domainName = "12345|https://example.com|client-id-12345";
+        string memory azp = "client-id-12345";
         vm.expectRevert(
             abi.encodeWithSelector(
                 OwnableUpgradeable.OwnableUnauthorizedAccount.selector,
                 vm.addr(2)
             )
         );
-        jwtRegistry.disableAzp(domainName);
+        jwtRegistry.disableAzp(azp);
         vm.stopPrank();
     }
 

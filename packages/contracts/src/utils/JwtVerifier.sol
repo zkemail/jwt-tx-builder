@@ -53,10 +53,10 @@ contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
         string[] memory parts = proof.domainName.stringToArray();
 
         // kid
-        pubSignals[0] = uint256(parts[0].hexStringToBytes32());
+        pubSignals[0] = uint256(parts[1].hexStringToBytes32());
         // iss
         uint256[] memory stringFields;
-        stringFields = _packBytes2Fields(bytes(parts[1]), ISS_BYTES);
+        stringFields = _packBytes2Fields(bytes(parts[0]), ISS_BYTES);
         for (uint256 i = 0; i < ISS_FIELDS; i++) {
             pubSignals[1 + i] = stringFields[i];
         }

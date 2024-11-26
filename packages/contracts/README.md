@@ -82,7 +82,7 @@ forge script script/Deploy_jwtRegistry.s.sol:DeployScript --rpc-url $RPC_URL --b
      // Create jwt registry and set DKIM public key hash
      jwtRegistry = new JwtRegistry(deployer);
      jwtRegistry.setDKIMPublicKeyHash(
-         "12345|https://example.com|client-id-12345",
+         "https://example.com|12345",
          publicKeyHash
      );
 
