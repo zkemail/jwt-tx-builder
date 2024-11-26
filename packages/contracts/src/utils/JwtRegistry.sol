@@ -9,7 +9,6 @@ import {UUPSUpgradeable} from "@openzeppelin/contracts/proxy/utils/UUPSUpgradeab
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {strings} from "solidity-stringutils/src/strings.sol";
 import {StringToArrayUtils} from "./StringToArrayUtils.sol";
-import "forge-std/console.sol";
 
 /// @title JWT Registry
 /// @notice TODO
@@ -37,11 +36,6 @@ contract JwtRegistry is Ownable {
     ) public view returns (bool) {
         string[] memory parts = domainName.stringToArray();
         string memory kidAndIss = string(abi.encodePacked(parts[0], "|", parts[1]));
-        console.log("kidAndIss");
-        console.log(kidAndIss);
-        console.log(parts[0]);
-        console.log(parts[1]);
-
         return
             dkimRegistry.isDKIMPublicKeyHashValid(kidAndIss, publicKeyHash);
     }
@@ -72,11 +66,7 @@ contract JwtRegistry is Ownable {
             if(dkimRegistry.revokedDKIMPublicKeyHashes(publicKeyHash)){
                 continue;
             }
-            console.log("setDKIMPublicKeyHash");
-            console.log(kidAndIss);
-            console.logBytes32(publicKeyHash);
             dkimRegistry.setDKIMPublicKeyHash(kidAndIss, publicKeyHash);    
-            console.log("DONE: setDKIMPublicKeyHash");
         }
     }
 
