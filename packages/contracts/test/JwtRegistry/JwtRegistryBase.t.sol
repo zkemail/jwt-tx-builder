@@ -22,7 +22,9 @@ contract JwtRegistryTestBase is Test {
         // Create jwt registry
         jwtRegistry = new JwtRegistry(deployer);
         vm.startPrank(deployer);
-        jwtRegistry.updateJwtRegistry();
+        // TODO Call ChainLink Function, currently it's not implemented yet
+        // jwtRegistry.updateJwtRegistry();
+        jwtRegistry.setJwtPublicKey(issKidString, publicKeyHash);
         jwtRegistry.whitelistAzp(azpString);
         vm.stopPrank();
 
