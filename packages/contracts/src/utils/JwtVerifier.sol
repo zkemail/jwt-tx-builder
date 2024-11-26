@@ -9,7 +9,6 @@ import {IVerifier, JwtProof} from "../interfaces/IVerifier.sol";
 import {HexUtils} from "./HexUtils.sol";
 import {StringToArrayUtils} from "./StringToArrayUtils.sol";
 import {JwtRegistry} from "./JwtRegistry.sol";
-import "forge-std/console.sol";
 
 contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
     using strings for *;
@@ -53,10 +52,8 @@ contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
         // string[] = [iss, kid]
         string[] memory parts = proof.domainName.stringToArray();
 
-        console.log("kid");
         // kid
         pubSignals[0] = uint256(parts[1].hexStringToBytes32());
-        console.log("iss");
         // iss
         uint256[] memory stringFields;
         stringFields = _packBytes2Fields(bytes(parts[0]), ISS_BYTES);
