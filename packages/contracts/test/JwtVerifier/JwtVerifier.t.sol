@@ -3,6 +3,7 @@ pragma solidity ^0.8.12;
 
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
+import {JwtRegistry} from "../../src/utils/JwtRegistry.sol";
 import {JwtProof, JwtVerifier} from "../../src/utils/JwtVerifier.sol";
 import {JwtGroth16Verifier} from "../../src/utils/JwtGroth16Verifier.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
@@ -18,13 +19,14 @@ contract JwtVerifierTest_verifyjwtProof is Test {
     constructor() {}
 
     function setUp() public {
+        JwtRegistry jwtRegistry = new JwtRegistry(msg.sender);
         JwtVerifier verifierImpl = new JwtVerifier();
         JwtGroth16Verifier groth16Verifier = new JwtGroth16Verifier();
         ERC1967Proxy verifierProxy = new ERC1967Proxy(
             address(verifierImpl),
             abi.encodeCall(
                 verifierImpl.initialize,
-                (msg.sender, address(groth16Verifier))
+                (msg.sender, address(groth16Verifier), address(jwtRegistry))
             )
         );
         verifier = JwtVerifier(address(verifierProxy));
