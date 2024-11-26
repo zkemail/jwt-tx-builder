@@ -115,10 +115,10 @@ contract JwtRegistry is Ownable {
     }
 
     /// @notice Disables the azp (authorized party) associated with the given domain name
-    /// @param azpString The azp string
+    /// @param azp The azp string
     /// @dev This function removes the azp from the whitelisted clients
-    function disableAzp(string memory azpString) public onlyOwner {
-        require(bytes(azpString).length != 0, "Invalid azp string");
-        whitelistedClients[azpString] = false;
+    function disableAzp(string memory azp) public onlyOwner {
+        require(bytes(azp).length != 0, "Invalid azp string");
+        whitelistedClients[azp] = false;
     }
 }
