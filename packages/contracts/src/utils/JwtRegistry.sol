@@ -52,6 +52,30 @@ contract JwtRegistry is Ownable {
         return this.isJwtPublicKeyHashValid(domainName, publicKeyHash);
     }
 
+    /// @notice Sets a public key hash for a `iss|kid` string  after validating the provided signature.
+    /// @param domainName The domain name contains iss and kid fields.
+    /// @param publicKeyHash The public key hash to set.
+    /// @dev This function requires that the public key hash is not already set or revoked.
+    function setJwtPublicKey(
+        string memory domainName,
+        bytes32 publicKeyHash
+    ) public onlyOwner {
+        require(bytes(domainName).length != 0, "Invalid domain name");
+        require(publicKeyHash != bytes32(0), "Invalid public key hash");
+        string[] memory parts = domainName.stringToArray();
+        string memory issAndKid = string(abi.encodePacked(parts[0], "|", parts[1]));
+        require(
+            isJwtPublicKeyHashValid(domainName, publicKeyHash) == false,
+            "publicKeyHash is already set"
+        );
+        require(
+            dkimRegistry.revokedDKIMPublicKeyHashes(publicKeyHash) == false,
+            "publicKeyHash is revoked"
+        );
+
+        dkimRegistry.setDKIMPublicKeyHash(issAndKid, publicKeyHash);
+    }
+
     function updateJwtRegistry() public onlyOwner {
         // TODO Call ChainLink Function
         // TODO Receive iss, kid, publicKeyHash
