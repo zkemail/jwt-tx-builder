@@ -50,7 +50,6 @@ export interface JWTVerifierInputs {
 export interface JWTAuthenticatorInputs extends JWTVerifierInputs {
     accountCode: bigint;
     codeIndex: string;
-    jwtTypStartIndex: string;
     jwtKidStartIndex: string;
     issKeyStartIndex: string;
     issLength: string;
@@ -174,7 +173,6 @@ function validateAnonymousDomainParams(params: JWTInputGenerationArgs): void {
  */
 function findJWTIndices(header: string, payload: string) {
     return {
-        jwtTypStartIndex: header.indexOf('"typ":"JWT"').toString(),
         jwtKidStartIndex: header.indexOf('"kid":').toString(),
         issKeyStartIndex: payload.indexOf('"iss":').toString(),
         iatKeyStartIndex: payload.indexOf('"iat":').toString(),

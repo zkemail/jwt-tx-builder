@@ -86,7 +86,6 @@ describe("JWT Input Generators", () => {
             // Authenticator-specific checks
             expect(result.accountCode).toBe(validAccountCode);
             expect(result.codeIndex).toBeDefined();
-            expect(result.jwtTypStartIndex).toBeDefined();
             expect(result.jwtKidStartIndex).toBeDefined();
             expect(result.issKeyStartIndex).toBeDefined();
             expect(result.issLength).toBeDefined();

@@ -10,6 +10,28 @@ include "@zk-email/circuits/lib/base64.circom";
 include "./utils/bytes.circom";
 include "./utils/array.circom";
 
+/// @title JWTVerifier
+/// @notice Verifies JWT signatures and extracts header/payload components
+/// @dev This template verifies RSA-SHA256 signed JWTs and decodes Base64 encoded components.
+///      It works by:
+///      1. Verifying message length and padding
+///      2. Computing SHA256 hash of `header.payload`
+///      3. Verifying RSA signature against public key
+///      4. Extracting and decoding Base64 header/payload
+///      5. Computing public key hash for external reference
+/// @param n RSA chunk size in bits (n < 127 for field arithmetic)
+/// @param k Number of RSA chunks (n*k > 2048 for RSA-2048)
+/// @param maxMessageLength Maximum JWT string length (must be multiple of 64 for SHA256)
+/// @param maxB64HeaderLength Maximum Base64 header length (must be multiple of 4)
+/// @param maxB64PayloadLength Maximum Base64 payload length (must be multiple of 4)
+/// @input message[maxMessageLength] JWT string (header.payload)
+/// @input messageLength Actual length of JWT string
+/// @input pubkey[k] RSA public key in k chunks
+/// @input signature[k] RSA signature in k chunks
+/// @input periodIndex Location of period separating header.payload
+/// @output publicKeyHash Poseidon hash of public key
+/// @output header[maxHeaderLength] Decoded JWT header
+/// @output payload[maxPayloadLength] Decoded JWT payload
 template JWTVerifier(
     n,
     k,

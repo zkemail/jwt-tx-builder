@@ -83,7 +83,7 @@ describe("JWT Authenticator Circuit", () => {
         circuit = await wasm_tester(
             path.join(
                 __dirname,
-                "./test-circuits/jwt-authenticator-test.circom"
+                "./test-circuits/jwt-auth-test.circom"
             ),
             {
                 recompile: true,
@@ -766,7 +766,7 @@ describe("Anonymous Email Domains", () => {
         circuit = await wasm_tester(
             path.join(
                 __dirname,
-                "./test-circuits/jwt-authenticator-with-anon-email-domains-test.circom"
+                "./test-circuits/jwt-auth-with-anon-email-domains-test.circom"
             ),
             {
                 recompile: true,
