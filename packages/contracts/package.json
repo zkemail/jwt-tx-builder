@@ -4,8 +4,8 @@
   "license": "MIT",
   "scripts": {
     "build": "forge build --skip '*ZKSync*'",
-    "test:unit": "forge test --no-match-test test_verifyEmailProof",
-    "test:integration": "forge test --match-test test_verifyEmailProof --ffi -vvv",
+    "test:unit": "forge test --no-match-test test_verifyjwtProof",
+    "test:integration": "forge test --match-test test_verifyjwtProof --ffi -vvv",
     "lint": "solhint 'src/**/*.sol'"
   },
   "dependencies": {

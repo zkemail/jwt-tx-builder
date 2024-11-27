@@ -14,47 +14,30 @@ contract JwtRegistryTest_disableAzp is JwtRegistryTestBase {
         super.setUp();
     }
 
-    function testRevert_disableAzp_invalidDomainNameFormat() public {
-        vm.startPrank(deployer);
-        string memory invalidDomainName = "12345|https://example.com";
-        vm.expectRevert(bytes("Invalid kid|iss|azp strings"));
-        jwtRegistry.disableAzp(invalidDomainName);
-        vm.stopPrank();
-    }
-
-    function testRevert_disableAzp_tooManyParts() public {
-        vm.startPrank(deployer);
-        string
-            memory invalidDomainName = "12345|https://example.com|client-id-12345|extra";
-        vm.expectRevert(bytes("Invalid kid|iss|azp strings"));
-        jwtRegistry.disableAzp(invalidDomainName);
-        vm.stopPrank();
-    }
-
     function testRevert_disableAzp_emptyString() public {
         vm.startPrank(deployer);
-        string memory invalidDomainName = "";
-        vm.expectRevert(bytes("Invalid kid|iss|azp strings"));
-        jwtRegistry.disableAzp(invalidDomainName);
+        string memory azp = "";
+        vm.expectRevert(bytes("Invalid azp string"));
+        jwtRegistry.disableAzp(azp);
         vm.stopPrank();
     }
 
     function testRevert_disableAzp_OwnableUnauthorizedAccount() public {
         vm.startPrank(vm.addr(2));
-        string memory domainName = "12345|https://example.com|client-id-12345";
+        string memory azp = "client-id-12345";
         vm.expectRevert(
             abi.encodeWithSelector(
                 OwnableUpgradeable.OwnableUnauthorizedAccount.selector,
                 vm.addr(2)
             )
         );
-        jwtRegistry.disableAzp(domainName);
+        jwtRegistry.disableAzp(azp);
         vm.stopPrank();
     }
 
     function test_disableAzp() public {
         vm.startPrank(deployer);
-        string memory domainName = "12345|https://example.com|client-id-12345";
+        string memory azp = "client-id-12345";
 
         // Verify that client-id-12345 is whitelisted
         assertTrue(
@@ -63,7 +46,7 @@ contract JwtRegistryTest_disableAzp is JwtRegistryTestBase {
         );
 
         // Call disableAzp
-        jwtRegistry.disableAzp(domainName);
+        jwtRegistry.disableAzp(azp);
 
         // Verify that client-id-12345 is no longer whitelisted
         assertFalse(
