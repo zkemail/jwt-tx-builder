@@ -81,10 +81,7 @@ describe("JWT Authenticator Circuit", () => {
 
     beforeAll(async () => {
         circuit = await wasm_tester(
-            path.join(
-                __dirname,
-                "./test-circuits/jwt-auth-test.circom"
-            ),
+            path.join(__dirname, "./test-circuits/jwt-auth-test.circom"),
             {
                 recompile: true,
                 include: path.join(__dirname, "../../../node_modules"),

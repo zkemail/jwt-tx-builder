@@ -146,8 +146,8 @@ function decodeJWT(
     headerString: string,
     payloadString: string
 ): { header: string; payload: string; parsedPayload: any } {
-    const header = Buffer.from(headerString, "base64").toString("utf-8");
-    const payload = Buffer.from(payloadString, "base64").toString("utf-8");
+    const header = Buffer.from(headerString, "base64").toString();
+    const payload = Buffer.from(payloadString, "base64").toString();
     try {
         const parsedPayload = JSON.parse(payload);
         return { header, payload, parsedPayload };
@@ -172,13 +172,16 @@ function validateAnonymousDomainParams(params: JWTInputGenerationArgs): void {
  * Finds all required indices in JWT header and payload
  */
 function findJWTIndices(header: string, payload: string) {
+    const headerBuffer = Buffer.from(header);
+    const payloadBuffer = Buffer.from(payload);
+
     return {
-        jwtKidStartIndex: header.indexOf('"kid":').toString(),
-        issKeyStartIndex: payload.indexOf('"iss":').toString(),
-        iatKeyStartIndex: payload.indexOf('"iat":').toString(),
-        azpKeyStartIndex: payload.indexOf('"azp":').toString(),
-        emailKeyStartIndex: payload.indexOf('"email":').toString(),
-        nonceKeyStartIndex: payload.indexOf('"nonce":').toString(),
+        jwtKidStartIndex: headerBuffer.indexOf('"kid":').toString(),
+        issKeyStartIndex: payloadBuffer.indexOf('"iss":').toString(),
+        iatKeyStartIndex: payloadBuffer.indexOf('"iat":').toString(),
+        azpKeyStartIndex: payloadBuffer.indexOf('"azp":').toString(),
+        emailKeyStartIndex: payloadBuffer.indexOf('"email":').toString(),
+        nonceKeyStartIndex: payloadBuffer.indexOf('"nonce":').toString(),
     };
 }
 
