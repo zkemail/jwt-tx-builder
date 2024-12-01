@@ -5,9 +5,10 @@ import "../interfaces/IJwtGroth16Verifier.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {strings} from "solidity-stringutils/src/strings.sol";
-import {IVerifier, EmailProof} from "../interfaces/IVerifier.sol";
+import {IVerifier, JwtProof} from "../interfaces/IVerifier.sol";
 import {HexUtils} from "./HexUtils.sol";
 import {StringToArrayUtils} from "./StringToArrayUtils.sol";
+import {JwtRegistry} from "./JwtRegistry.sol";
 
 contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
     using strings for *;
@@ -15,6 +16,7 @@ contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
     using StringToArrayUtils for string;
 
     IJwtGroth16Verifier groth16Verifier;
+    JwtRegistry jwtRegistry;
 
     uint256 public constant ISS_FIELDS = 2;
     uint256 public constant ISS_BYTES = 32;
@@ -29,15 +31,15 @@ contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
     /// @param _initialOwner The address of the initial owner
     function initialize(
         address _initialOwner,
-        address _groth16Verifier
+        address _groth16Verifier,
+        address _jwtRegistry
     ) public initializer {
         __Ownable_init(_initialOwner);
         groth16Verifier = IJwtGroth16Verifier(_groth16Verifier);
+        jwtRegistry = JwtRegistry(_jwtRegistry);
     }
 
-    function verifyEmailProof(
-        EmailProof memory proof
-    ) public view returns (bool) {
+    function verifyJwtProof(JwtProof memory proof) public returns (bool) {
         (
             uint256[2] memory pA,
             uint256[2][2] memory pB,
@@ -46,22 +48,22 @@ contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
 
         uint256[ISS_FIELDS + COMMAND_FIELDS + AZP_FIELDS + 6] memory pubSignals;
 
-        // Split a string consisting of kid|iss|azp concatenated in domainName by stringToArray with | as delimiter
-        // string[] = [kid, iss, azp]
+        // Split a string consisting of iss|kid concatenated in domainName by stringToArray with | as delimiter
+        // string[] = [iss, kid]
         string[] memory parts = proof.domainName.stringToArray();
 
         // kid
-        pubSignals[0] = uint256(parts[0].hexStringToBytes32());
+        pubSignals[0] = uint256(parts[1].hexStringToBytes32());
         // iss
         uint256[] memory stringFields;
-        stringFields = _packBytes2Fields(bytes(parts[1]), ISS_BYTES);
+        stringFields = _packBytes2Fields(bytes(parts[0]), ISS_BYTES);
         for (uint256 i = 0; i < ISS_FIELDS; i++) {
             pubSignals[1 + i] = stringFields[i];
         }
         // publicKeyHash;
         pubSignals[1 + ISS_FIELDS] = uint256(proof.publicKeyHash);
         // jwtNullifier;
-        pubSignals[1 + ISS_FIELDS + 1] = uint256(proof.emailNullifier);
+        pubSignals[1 + ISS_FIELDS + 1] = uint256(proof.jwtNullifier);
         // timestamp;
         pubSignals[1 + ISS_FIELDS + 2] = uint256(proof.timestamp);
 
@@ -78,7 +80,7 @@ contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
             proof.accountSalt
         );
         // azp
-        stringFields = _packBytes2Fields(bytes(parts[2]), AZP_BYTES);
+        stringFields = _packBytes2Fields(bytes(proof.azp), AZP_BYTES);
         for (uint256 i = 0; i < AZP_FIELDS; i++) {
             pubSignals[
                 1 + ISS_FIELDS + 3 + COMMAND_FIELDS + 1 + i
@@ -88,6 +90,30 @@ contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
             .isCodeExist
             ? 1
             : 0;
+
+        // Check JwtRegistry, 
+        // if it returns false, then call updateJwtRegistry, 
+        // and then try isJwtPublicKeyValid again.
+        if (
+            !jwtRegistry.isJwtPublicKeyValid(
+                proof.domainName,
+                proof.publicKeyHash
+            )
+        ) {
+            jwtRegistry.updateJwtRegistry();
+            require(
+                jwtRegistry.isJwtPublicKeyValid(
+                    proof.domainName,
+                    proof.publicKeyHash
+                ),
+                "Invalid public key hash"
+            );
+        }
+        // Check if azp is in whitelist
+        require(
+            jwtRegistry.isAzpWhitelisted(proof.azp),
+            "azp is not whitelisted"
+        );
 
         return groth16Verifier.verifyProof(pA, pB, pC, pubSignals);
     }

@@ -3,6 +3,7 @@
 pragma solidity ^0.8.12;
 
 import "forge-std/Script.sol";
+import "../src/utils/JwtRegistry.sol";
 import "../src/utils/JwtVerifier.sol";
 import "../src/utils/JwtGroth16Verifier.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
@@ -19,6 +20,10 @@ contract DeployScript is Script {
         vm.startBroadcast(deployerPrivateKey);
 
         // Deploy the contract using CREATE2
+        JwtRegistry jwtRegistry = new JwtRegistry{salt: salt}(deployer);
+
+        console.log("JwtRegistry deployed to:", address(jwtRegistry));
+
         JwtVerifier jwtVerifierImpl = new JwtVerifier();
         console.log(
             "JWTVerifier implementation deployed at: %s",
@@ -29,7 +34,7 @@ contract DeployScript is Script {
             address(jwtVerifierImpl),
             abi.encodeCall(
                 jwtVerifierImpl.initialize,
-                (initialOwner, address(groth16Verifier))
+                (initialOwner, address(groth16Verifier), address(jwtRegistry))
             )
         );
 

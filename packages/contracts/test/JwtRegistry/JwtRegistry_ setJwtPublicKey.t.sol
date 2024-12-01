@@ -16,7 +16,7 @@ contract JwtRegistryTest_setJwtPublicKey is JwtRegistryTestBase {
 
     function testRevert_setJwtPublicKey_publicKeyHashIsAlreadySet() public {
         vm.startPrank(deployer);
-        string memory domainName = "12345|https://example.com|client-id-12345";
+        string memory domainName = "https://example.com|12345";
         vm.expectRevert(bytes("publicKeyHash is already set"));
         jwtRegistry.setJwtPublicKey(domainName, publicKeyHash);
         vm.stopPrank();
@@ -24,7 +24,7 @@ contract JwtRegistryTest_setJwtPublicKey is JwtRegistryTestBase {
 
     function testRevert_setJwtPublicKey_publicKeyHashIsRevoked() public {
         vm.startPrank(deployer);
-        string memory domainName = "12345|https://example.com|client-id-12345";
+        string memory domainName = "https://example.com|12345";
         jwtRegistry.revokeDKIMPublicKeyHash(domainName, publicKeyHash);
         vm.expectRevert(bytes("publicKeyHash is revoked"));
         jwtRegistry.setJwtPublicKey(domainName, publicKeyHash);
@@ -33,7 +33,7 @@ contract JwtRegistryTest_setJwtPublicKey is JwtRegistryTestBase {
 
     function testRevert_setJwtPublicKey_OwnableUnauthorizedAccount() public {
         vm.startPrank(vm.addr(2));
-        string memory domainName = "12345|https://example.com|client-id-12345";
+        string memory domainName = "https://example.com|12345";
         vm.expectRevert(
             abi.encodeWithSelector(
                 OwnableUpgradeable.OwnableUnauthorizedAccount.selector,
@@ -46,7 +46,7 @@ contract JwtRegistryTest_setJwtPublicKey is JwtRegistryTestBase {
 
     function test_setJwtPublicKey() public {
         vm.startPrank(deployer);
-        string memory domainName = "12345|https://example.xyz|client-id-12345";
+        string memory domainName = "https://example.xyz|12345";
         jwtRegistry.setJwtPublicKey(domainName, publicKeyHash);
         assertEq(jwtRegistry.whitelistedClients("client-id-12345"), true);
         vm.stopPrank();

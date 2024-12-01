@@ -9,7 +9,9 @@ import {JwtRegistryTestBase} from "./JwtRegistryBase.t.sol";
 contract JwtRegistryTestBase is Test {
     bytes32 publicKeyHash =
         0x0ea9c777dc7110e5a9e89b13f0cfc540e3845ba120b2b6dc24024d61488d4788;
-    string kidIssAzpString = "12345|https://example.com|client-id-12345";
+    string issKidString = "https://example.com|12345";
+    string azpString = "client-id-12345";
+    
     JwtRegistry jwtRegistry;
 
     address deployer = vm.addr(1);
@@ -17,21 +19,25 @@ contract JwtRegistryTestBase is Test {
     constructor() {}
 
     function setUp() public virtual {
-        // Create jwt dkim registry
-        jwtRegistry = new JwtRegistry(deployer);
+        // Create jwt registry
         vm.startPrank(deployer);
-        jwtRegistry.setJwtPublicKey(kidIssAzpString, publicKeyHash);
+        jwtRegistry = new JwtRegistry(deployer);
+
+        // TODO Call ChainLink Function, currently it's not implemented yet
+        // jwtRegistry.updateJwtRegistry();
+        jwtRegistry.setJwtPublicKey(issKidString, publicKeyHash);
+        jwtRegistry.whitelistAzp(azpString);
         vm.stopPrank();
 
-        bool isRegistered = jwtRegistry.isDKIMPublicKeyHashValid(
-            kidIssAzpString,
+        bool isRegistered = jwtRegistry.isJwtPublicKeyHashValid(
+            issKidString,
             publicKeyHash
         );
-        assertTrue(isRegistered, "DKIM Public Key Hash should be registered");
+        assertTrue(isRegistered, "JWT Public Key Hash should be registered");
         isRegistered = jwtRegistry.isJwtPublicKeyValid(
-            kidIssAzpString,
+            issKidString,
             publicKeyHash
         );
-        assertTrue(isRegistered, "DKIM Public Key Hash should be registered");
+        assertTrue(isRegistered, "JWT Public Key Hash should be registered");
     }
 }
