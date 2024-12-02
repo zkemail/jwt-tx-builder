@@ -2802,40 +2802,35 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@zk-email/relayer-utils@npm:=0.3.7":
-  version: 0.3.7
-  resolution: "@zk-email/relayer-utils@npm:0.3.7"
-  dependencies:
-    "@mapbox/node-pre-gyp": ^1.0
-    cargo-cp-artifact: ^0.1
-    node-pre-gyp-github: "git+https://github.com/ultamatt/node-pre-gyp-github.git"
-  checksum: 0f0690c534a61527b511a10814cc37876eb7c44128823b765e0003ed441776bdcc7b74aefda5438c37301edc667be1a6a7df650763db3610f296b4abdcdcf925
-  languageName: node
-  linkType: hard
-
-"@zk-email/zk-regex-circom@npm:=2.1.1":
-  version: 2.1.1
-  resolution: "@zk-email/zk-regex-circom@npm:2.1.1"
-  dependencies:
-    commander: ^11.0.0
-    snarkjs: ^0.7.0
-  checksum: 0306d4acea44d53d43b02917d42faf334307301c9aa6938552ecf81935a3458bbe951b76f8e99b6845de980ef4b7912e2d444a3558cb2bbf6ce17e5c3bc04019
-  languageName: node
-  linkType: hard
-
-"@zk-email/zk-regex-circom@npm:^2.1.0, @zk-email/zk-regex-circom@npm:^2.1.1":
-  version: 2.3.1
-  resolution: "@zk-email/zk-regex-circom@npm:2.3.1"
-  dependencies:
-    commander: ^11.0.0
-    snarkjs: ^0.7.5
-  checksum: 81cf723b93c8ad052f52a62609068ae1452335304b53d978b8dc1d9ad7191bb8aa4727f5ab81fa8b21f62c80d23e21bed94fed9a4145c8b95122feadae76d8e0
-  languageName: node
-  linkType: hard
-
-"@zk-jwt/contracts@workspace:packages/contracts":
+"@zk-email/jwt-tx-builder-circuits@workspace:packages/circuits":
   version: 0.0.0-use.local
-  resolution: "@zk-jwt/contracts@workspace:packages/contracts"
+  resolution: "@zk-email/jwt-tx-builder-circuits@workspace:packages/circuits"
+  dependencies:
+    "@babel/core": ^7.22.5
+    "@babel/preset-env": ^7.22.20
+    "@babel/preset-typescript": ^7.23.0
+    "@types/jest": ^29.5.4
+    "@zk-email/circuits": 6.1.5-nightly.2024-09-16
+    "@zk-email/ether-email-auth-circom": ^0.0.2-preview
+    "@zk-email/zk-regex-circom": ^2.1.1
+    chai: ^4.3.7
+    circom_tester: ^0.0.19
+    circomlib: ^2.0.5
+    circomlibjs: ^0.1.2
+    ffjavascript: ^0.2.59
+    jest: ^29.5.0
+    mocha: ^10.2.0
+    snarkjs: ^0.7.4
+    ts-jest: ^29.1.1
+    typescript: ^4.8.3
+  peerDependencies:
+    "@babel/core": ^7.22.5
+  languageName: unknown
+  linkType: soft
+
+"@zk-email/jwt-tx-builder-contracts@workspace:packages/contracts":
+  version: 0.0.0-use.local
+  resolution: "@zk-email/jwt-tx-builder-contracts@workspace:packages/contracts"
   dependencies:
     "@openzeppelin/contracts": ^5.0.0
     "@openzeppelin/contracts-upgradeable": ^5.0.0
@@ -2848,9 +2843,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@zk-jwt/helpers@workspace:packages/helpers":
+"@zk-email/jwt-tx-builder-helpers@workspace:packages/helpers":
   version: 0.0.0-use.local
-  resolution: "@zk-jwt/helpers@workspace:packages/helpers"
+  resolution: "@zk-email/jwt-tx-builder-helpers@workspace:packages/helpers"
   dependencies:
     "@babel/core": ^7.22.5
     "@babel/preset-env": ^7.22.2
@@ -2897,31 +2892,36 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@zk-jwt/zk-jwt-circuits@workspace:packages/circuits":
-  version: 0.0.0-use.local
-  resolution: "@zk-jwt/zk-jwt-circuits@workspace:packages/circuits"
+"@zk-email/relayer-utils@npm:=0.3.7":
+  version: 0.3.7
+  resolution: "@zk-email/relayer-utils@npm:0.3.7"
   dependencies:
-    "@babel/core": ^7.22.5
-    "@babel/preset-env": ^7.22.20
-    "@babel/preset-typescript": ^7.23.0
-    "@types/jest": ^29.5.4
-    "@zk-email/circuits": 6.1.5-nightly.2024-09-16
-    "@zk-email/ether-email-auth-circom": ^0.0.2-preview
-    "@zk-email/zk-regex-circom": ^2.1.1
-    chai: ^4.3.7
-    circom_tester: ^0.0.19
-    circomlib: ^2.0.5
-    circomlibjs: ^0.1.2
-    ffjavascript: ^0.2.59
-    jest: ^29.5.0
-    mocha: ^10.2.0
-    snarkjs: ^0.7.4
-    ts-jest: ^29.1.1
-    typescript: ^4.8.3
-  peerDependencies:
-    "@babel/core": ^7.22.5
-  languageName: unknown
-  linkType: soft
+    "@mapbox/node-pre-gyp": ^1.0
+    cargo-cp-artifact: ^0.1
+    node-pre-gyp-github: "git+https://github.com/ultamatt/node-pre-gyp-github.git"
+  checksum: 0f0690c534a61527b511a10814cc37876eb7c44128823b765e0003ed441776bdcc7b74aefda5438c37301edc667be1a6a7df650763db3610f296b4abdcdcf925
+  languageName: node
+  linkType: hard
+
+"@zk-email/zk-regex-circom@npm:=2.1.1":
+  version: 2.1.1
+  resolution: "@zk-email/zk-regex-circom@npm:2.1.1"
+  dependencies:
+    commander: ^11.0.0
+    snarkjs: ^0.7.0
+  checksum: 0306d4acea44d53d43b02917d42faf334307301c9aa6938552ecf81935a3458bbe951b76f8e99b6845de980ef4b7912e2d444a3558cb2bbf6ce17e5c3bc04019
+  languageName: node
+  linkType: hard
+
+"@zk-email/zk-regex-circom@npm:^2.1.0, @zk-email/zk-regex-circom@npm:^2.1.1":
+  version: 2.3.1
+  resolution: "@zk-email/zk-regex-circom@npm:2.3.1"
+  dependencies:
+    commander: ^11.0.0
+    snarkjs: ^0.7.5
+  checksum: 81cf723b93c8ad052f52a62609068ae1452335304b53d978b8dc1d9ad7191bb8aa4727f5ab81fa8b21f62c80d23e21bed94fed9a4145c8b95122feadae76d8e0
+  languageName: node
+  linkType: hard
 
 "@zk-jwt/zk-jwt@workspace:.":
   version: 0.0.0-use.local

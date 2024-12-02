@@ -35,18 +35,23 @@ export interface JWTInputGenerationArgs {
     emailDomainPath?: bigint[];
     /** Helper values for the Merkle proof */
     emailDomainPathHelper?: number[];
+    /** Expose the sub value in the JWT payload which is the unique Google ID */
+    exposeGoogleId?: boolean;
 }
 
-/** Base circuit inputs interface */
-export interface BaseJWTVerifierInputs {
+/** Base JWT verifier inputs interface */
+export interface JWTVerifierInputs {
     message: string[];
     messageLength: string;
     pubkey: string[];
     signature: string[];
+    periodIndex: string;
+}
+
+/** JWT authenticator inputs interface */
+export interface JWTAuthenticatorInputs extends JWTVerifierInputs {
     accountCode: bigint;
     codeIndex: string;
-    periodIndex: string;
-    jwtTypStartIndex: string;
     jwtKidStartIndex: string;
     issKeyStartIndex: string;
     issLength: string;
@@ -61,8 +66,9 @@ export interface BaseJWTVerifierInputs {
     emailDomainLength: number;
 }
 
-/** Anonymous domain circuit inputs interface */
-export interface AnonymousJWTVerifierInputs extends BaseJWTVerifierInputs {
+/** Anonymous domain authenticator inputs interface */
+export interface JWTAuthenticatorWithAnonDomainsInputs
+    extends JWTAuthenticatorInputs {
     anonymousDomainsTreeRoot: string;
     emailDomainPath: string[];
     emailDomainPathHelper: string[];
@@ -142,8 +148,8 @@ function decodeJWT(
     headerString: string,
     payloadString: string
 ): { header: string; payload: string; parsedPayload: any } {
-    const header = Buffer.from(headerString, "base64").toString("utf-8");
-    const payload = Buffer.from(payloadString, "base64").toString("utf-8");
+    const header = Buffer.from(headerString, "base64").toString();
+    const payload = Buffer.from(payloadString, "base64").toString();
     try {
         const parsedPayload = JSON.parse(payload);
         return { header, payload, parsedPayload };
@@ -167,16 +173,34 @@ function validateAnonymousDomainParams(params: JWTInputGenerationArgs): void {
 /**
  * Finds all required indices in JWT header and payload
  */
-function findJWTIndices(header: string, payload: string) {
-    return {
-        jwtTypStartIndex: header.indexOf('"typ":"JWT"').toString(),
-        jwtKidStartIndex: header.indexOf('"kid":').toString(),
-        issKeyStartIndex: payload.indexOf('"iss":').toString(),
-        iatKeyStartIndex: payload.indexOf('"iat":').toString(),
-        azpKeyStartIndex: payload.indexOf('"azp":').toString(),
-        emailKeyStartIndex: payload.indexOf('"email":').toString(),
-        nonceKeyStartIndex: payload.indexOf('"nonce":').toString(),
-    };
+function findJWTIndices(
+    params: JWTInputGenerationArgs,
+    header: string,
+    payload: string
+) {
+    const headerBuffer = Buffer.from(header);
+    const payloadBuffer = Buffer.from(payload);
+
+    if (params.exposeGoogleId) {
+        return {
+            jwtKidStartIndex: headerBuffer.indexOf('"kid":').toString(),
+            issKeyStartIndex: payloadBuffer.indexOf('"iss":').toString(),
+            iatKeyStartIndex: payloadBuffer.indexOf('"iat":').toString(),
+            azpKeyStartIndex: payloadBuffer.indexOf('"azp":').toString(),
+            emailKeyStartIndex: payloadBuffer.indexOf('"email":').toString(),
+            nonceKeyStartIndex: payloadBuffer.indexOf('"nonce":').toString(),
+            subKeyStartIndex: payloadBuffer.indexOf('"sub":').toString(),
+        };
+    } else {
+        return {
+            jwtKidStartIndex: headerBuffer.indexOf('"kid":').toString(),
+            issKeyStartIndex: payloadBuffer.indexOf('"iss":').toString(),
+            iatKeyStartIndex: payloadBuffer.indexOf('"iat":').toString(),
+            azpKeyStartIndex: payloadBuffer.indexOf('"azp":').toString(),
+            emailKeyStartIndex: payloadBuffer.indexOf('"email":').toString(),
+            nonceKeyStartIndex: payloadBuffer.indexOf('"nonce":').toString(),
+        };
+    }
 }
 
 /**
@@ -204,44 +228,13 @@ function handleError(error: any): never {
 }
 
 /**
- * Generates circuit inputs for JWT verification
- * @param rawJWT - Raw JWT string to verify
- * @param publicKey - RSA public key for verification
- * @param accountCode - Account code to verify against
- * @param params - Optional configuration parameters
- * @returns Circuit inputs for verification
+ * Generates base JWT verifier circuit inputs
  */
 export async function generateJWTVerifierInputs(
     rawJWT: string,
     publicKey: RSAPublicKey,
-    accountCode: bigint,
     params: JWTInputGenerationArgs = {}
-): Promise<BaseJWTVerifierInputs | AnonymousJWTVerifierInputs> {
-    return params.verifyAnonymousDomains
-        ? await _generateJWTVerifierWithAnonymousDomainInputs(
-              rawJWT,
-              publicKey,
-              accountCode,
-              params
-          )
-        : await _generateJWTVerifierInputs(
-              rawJWT,
-              publicKey,
-              accountCode,
-              params
-          );
-}
-
-/**
- * Validates JWT and generates base circuit inputs
- * @private
- */
-async function _generateJWTVerifierInputs(
-    rawJWT: string,
-    publicKey: RSAPublicKey,
-    accountCode: bigint,
-    params: JWTInputGenerationArgs = {}
-): Promise<BaseJWTVerifierInputs> {
+): Promise<JWTVerifierInputs> {
     try {
         validateInputs(rawJWT, publicKey);
         const [headerString, payloadString, signatureString] = splitJWT(rawJWT);
@@ -253,24 +246,49 @@ async function _generateJWTVerifierInputs(
             payloadString,
             params
         );
-        const { header, payload, parsedPayload } = decodeJWT(
-            headerString,
-            payloadString
-        );
-
-        const indices = findJWTIndices(header, payload);
-        const lengths = calculateLengths(parsedPayload);
-        const { domain, index } = getDomainFromEmail(parsedPayload.email);
-        const codeIndex = findCodeIndex(parsedPayload.nonce, accountCode);
 
         return {
             message: Uint8ArrayToCharArray(messagePadded),
             messageLength: messagePaddedLen.toString(),
             pubkey: toCircomBigIntBytes(base64ToBigInt(publicKey.n)),
             signature: toCircomBigIntBytes(base64ToBigInt(signatureString)),
+            periodIndex: periodIndex.toString(),
+        };
+    } catch (error: any) {
+        handleError(error);
+    }
+}
+
+/**
+ * Generates JWT authenticator circuit inputs
+ */
+export async function generateJWTAuthenticatorInputs(
+    rawJWT: string,
+    publicKey: RSAPublicKey,
+    accountCode: bigint,
+    params: JWTInputGenerationArgs = {}
+): Promise<JWTAuthenticatorInputs> {
+    try {
+        const baseInputs = await generateJWTVerifierInputs(
+            rawJWT,
+            publicKey,
+            params
+        );
+        const [headerString, payloadString] = splitJWT(rawJWT);
+        const { header, payload, parsedPayload } = decodeJWT(
+            headerString,
+            payloadString
+        );
+
+        const indices = findJWTIndices(params, header, payload);
+        const lengths = calculateLengths(parsedPayload);
+        const { domain, index } = getDomainFromEmail(parsedPayload.email);
+        const codeIndex = findCodeIndex(parsedPayload.nonce, accountCode);
+
+        return {
+            ...baseInputs,
             accountCode,
             codeIndex: codeIndex.toString(),
-            periodIndex: periodIndex.toString(),
             ...indices,
             ...lengths,
             emailDomainIndex: index.toString(),
@@ -282,22 +300,21 @@ async function _generateJWTVerifierInputs(
 }
 
 /**
- * Generates circuit inputs with anonymous domain support
- * @private
+ * Generates JWT authenticator circuit inputs with anonymous domain support
  */
-async function _generateJWTVerifierWithAnonymousDomainInputs(
+export async function generateJWTAuthenticatorWithAnonDomainsInputs(
     rawJWT: string,
     publicKey: RSAPublicKey,
     accountCode: bigint,
     params: JWTInputGenerationArgs
-): Promise<AnonymousJWTVerifierInputs> {
-    const baseInputs = await _generateJWTVerifierInputs(
+): Promise<JWTAuthenticatorWithAnonDomainsInputs> {
+    validateAnonymousDomainParams(params);
+    const baseInputs = await generateJWTAuthenticatorInputs(
         rawJWT,
         publicKey,
         accountCode,
         params
     );
-    validateAnonymousDomainParams(params);
 
     return {
         ...baseInputs,

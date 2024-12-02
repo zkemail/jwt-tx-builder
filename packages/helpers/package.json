@@ -1,5 +1,5 @@
 {
-    "name": "@zk-jwt/helpers",
+    "name": "@zk-email/jwt-tx-builder-helpers",
     "version": "0.0.1",
     "license": "MIT",
     "main": "dist",
