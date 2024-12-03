@@ -1,23 +1,23 @@
-# @zk-jwt/helpers
+# @zk-email/jwt-tx-builder-helpers
 
-The @zk-jwt/helpers package provides utility functions for JWT verification and cryptographic operations. It includes functions for handling RSA signatures, public keys, JWT messages, and hashes.
+The @zk-email/jwt-tx-builder-helpers package provides utility functions for JWT verification and cryptographic operations. It includes functions for handling RSA signatures, public keys, JWT messages, and hashes.
 
 ## Installation
 
 ```bash
-yarn add @zk-jwt/helpers
+yarn add @zk-email/jwt-tx-builder-helpers
 ```
 
 ### input-generators.ts
 
-The [input-generators.ts](./src/input-generators.ts) file provides functions for generating inputs to the JWTVerifier circuit. It includes utilities for JWT verification, input generation, and handling anonymous domains.
+The [input-generators.ts](./src/input-generators.ts) file provides functions for generating inputs to the JWT Auth circuit. It includes utilities for JWT verification, input generation, and handling anonymous domains.
 
 #### Key Interfaces:
 
 ```typescript
 export interface RSAPublicKey {
-    n: string;    // Base64-encoded modulus
-    e: number;    // Public exponent
+    n: string; // Base64-encoded modulus
+    e: number; // Public exponent
 }
 
 export interface JWTInputGenerationArgs {
@@ -38,7 +38,7 @@ async function generateJWTVerifierInputs(
     publicKey: RSAPublicKey,
     accountCode: bigint,
     params: JWTInputGenerationArgs = {}
-)
+);
 ```
 
 ## Testing

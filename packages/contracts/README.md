@@ -53,7 +53,7 @@ forge script script/Deploy_jwtRegistry.s.sol:DeployScript --rpc-url $RPC_URL --b
 1. **Installation**: First, install the package using yarn. Run the following command in your project directory:
 
    ```
-   yarn add @zk-jwt/contracts 
+   yarn add @zk-email/jwt-tx-builder-contracts 
    ```
 
 2. **Integration**: 
@@ -61,16 +61,16 @@ forge script script/Deploy_jwtRegistry.s.sol:DeployScript --rpc-url $RPC_URL --b
    - **Foundry**: Add the following line to remappings.txt:
 
    ```text
-   @zk-jwt/contracts=../../node_modules/@zk-jwt/contracts/src
+   @zk-email/jwt-tx-builder-contracts=../../node_modules/@zk-email/jwt-tx-builder-contracts/src
    ```
 
    - **Solidity**: Import the contracts in your Solidity files using the following syntax:
 
      ```solidity
      // Import necessary contracts for JWT verification
-     import {JwtVerifier} from "@zk-jwt/contracts/utils/JwtVerifier.sol";
-     import {JwtGroth16Verifier} from "@zk-jwt/contracts/utils/JwtGroth16Verifier.sol";
-     import {JwtRegistry} from "@zk-jwt/contracts/utils/JwtRegistry.sol";
+     import {JwtVerifier} from "@zk-email/jwt-tx-builder-contracts/utils/JwtVerifier.sol";
+     import {JwtGroth16Verifier} from "@zk-email/jwt-tx-builder-contracts/utils/JwtGroth16Verifier.sol";
+     import {JwtRegistry} from "@zk-email/jwt-tx-builder-contracts/utils/JwtRegistry.sol";
      ```
 
      You can use the imported contracts as follows:

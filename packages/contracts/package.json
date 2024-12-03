@@ -1,30 +1,30 @@
 {
-  "name": "@zk-jwt/contracts",
-  "version": "0.0.1",
-  "license": "MIT",
-  "scripts": {
-    "build": "forge build --skip '*ZKSync*'",
-    "test:unit": "forge test --no-match-test test_verifyEmailProof",
-    "test:integration": "forge test --match-test test_verifyEmailProof --ffi -vvv",
-    "lint": "solhint 'src/**/*.sol'"
-  },
-  "dependencies": {
-    "@openzeppelin/contracts": "^5.0.0",
-    "@openzeppelin/contracts-upgradeable": "^5.0.0",
-    "@zk-email/contracts": "^6.1.5",
-    "solady": "^0.0.123",
-    "solidity-stringutils": "git+https://github.com/LayerZero-Labs/solidity-stringutils.git"
-  },
-  "devDependencies": {
-    "ds-test": "git+https://github.com/dapphub/ds-test.git",
-    "forge-std": "git+https://github.com/foundry-rs/forge-std.git",
-    "solhint": "^3.6.2"
-  },
-  "files": [
-    "/src",
-    "foundry.toml",
-    "package.json",
-    "README.md",
-    "remappings.txt"
-  ]
+    "name": "@zk-email/jwt-tx-builder-contracts",
+    "version": "0.0.1",
+    "license": "MIT",
+    "scripts": {
+        "build": "forge build --skip '*ZKSync*'",
+        "test:unit": "forge test --no-match-test test_verifyEmailProof",
+        "test:integration": "forge test --match-test test_verifyEmailProof --ffi -vvv",
+        "lint": "solhint 'src/**/*.sol'"
+    },
+    "dependencies": {
+        "@openzeppelin/contracts": "^5.0.0",
+        "@openzeppelin/contracts-upgradeable": "^5.0.0",
+        "@zk-email/contracts": "^6.1.5",
+        "solady": "^0.0.123",
+        "solidity-stringutils": "git+https://github.com/LayerZero-Labs/solidity-stringutils.git"
+    },
+    "devDependencies": {
+        "ds-test": "git+https://github.com/dapphub/ds-test.git",
+        "forge-std": "git+https://github.com/foundry-rs/forge-std.git",
+        "solhint": "^3.6.2"
+    },
+    "files": [
+        "/src",
+        "foundry.toml",
+        "package.json",
+        "README.md",
+        "remappings.txt"
+    ]
 }

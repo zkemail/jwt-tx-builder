@@ -1,5 +1,4 @@
-import { Buffer } from "buffer";
-import { InvalidInputError } from "./errors";
+import { Buffer } from 'buffer';
 
 /**
  * @description Split a JWT token into its header, payload, and signature components
@@ -7,11 +6,11 @@ import { InvalidInputError } from "./errors";
  * @returns An array containing the header, payload, and signature as base64 encoded strings
  */
 export function splitJWT(jwt: string): [string, string, string] {
-    const parts = jwt.split(".");
-    if (parts.length !== 3) {
-        throw new InvalidInputError("Invalid JWT format: Missing components");
-    }
-    return [parts[0], parts[1], parts[2]];
+  const parts = jwt.split('.');
+  if (parts.length !== 3) {
+    throw new Error('Invalid JWT format: Missing components');
+  }
+  return [parts[0], parts[1], parts[2]];
 }
 
 /**
@@ -20,7 +19,7 @@ export function splitJWT(jwt: string): [string, string, string] {
  * @returns The corresponding bigint representation of the Base64 string.
  */
 export function base64ToBigInt(base64String: string): bigint {
-    return BigInt(`0x${Buffer.from(base64String, "base64").toString("hex")}`);
+  return BigInt(`0x${Buffer.from(base64String, 'base64').toString('hex')}`);
 }
 
 /**
@@ -30,12 +29,12 @@ export function base64ToBigInt(base64String: string): bigint {
  * @throws Error if the input is not a 256-bit bigint
  */
 export function bigInt256ToHex64(bigInt: bigint): string {
-    // Check if the bigint is within the valid range for 256 bits
-    if (bigInt < 0n || bigInt >= 1n << 256n) {
-        throw new Error("Input must be a 256-bit bigint (32 bytes)");
-    }
+  // Check if the bigint is within the valid range for 256 bits
+  if (bigInt < 0n || bigInt >= 1n << 256n) {
+    throw new Error('Input must be a 256-bit bigint (32 bytes)');
+  }
 
-    const hexString = bigInt.toString(16);
-    // Pad to 64 characters (32 bytes)
-    return hexString.padStart(64, "0");
+  const hexString = bigInt.toString(16);
+  // Pad to 64 characters (32 bytes)
+  return hexString.padStart(64, '0');
 }

@@ -1,5 +1,0 @@
-pragma circom 2.1.6;
-
-include "../../jwt-verifier-with-anon-domain-template.circom";
-
-component main { public [ anonymousDomainsTreeRoot ] } = JWTVerifierWithAnonymousDomain(121, 17, 1024, 128, 896, 72, 605, 2);

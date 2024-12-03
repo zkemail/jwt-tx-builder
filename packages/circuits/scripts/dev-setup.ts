@@ -21,7 +21,12 @@ program
     "Path to the directory storing output files"
   )
   .option("--silent", "No console logs")
-  .option("--body", "Enable body parsing");
+  .option("--body", "Enable body parsing")
+  .requiredOption(
+    "--circuit <string>",
+    "Path to the circuit file"
+  )
+  .option("--name <string>", "Custom name for the circuit", "circuit");
 
 program.parse();
 const args = program.opts();
@@ -140,34 +145,24 @@ async function generateKeys(
 
 async function exec() {
   const buildDir = args.output;
+  const circuitPath = args.circuit;
+  const circuitName = args.name;
 
-
-  if (!args.body) {
-    const phase1Path = path.join(buildDir, "powersOfTau28_hez_final_22.ptau");
-
-    await downloadPhase1(phase1Path);
-    log("✓ Phase 1:", phase1Path);
-
-    const emailAuthR1csPath = path.join(buildDir, "jwt-verifier.r1cs");
-    if (!fs.existsSync(emailAuthR1csPath)) {
-      throw new Error(`${emailAuthR1csPath} does not exist.`);
-    }
-    await generateKeys(phase1Path, emailAuthR1csPath, path.join(buildDir, "jwt-verifier.zkey"), path.join(buildDir, "jwt-verifier.vkey"), path.join(buildDir, "JwtGroth16Verifier.sol"));
-    log("✓ Keys for email auth circuit generated");
-  } else {
-    const phase1Path = path.join(buildDir, "powersOfTau28_hez_final_23.ptau");
-
-    await downloadPhase1(phase1Path);
-    log("✓ Phase 1:", phase1Path);
-
-    const emailAuthR1csPath = path.join(buildDir, "email_auth_with_body_parsing_with_qp_encoding.r1cs");
-    if (!fs.existsSync(emailAuthR1csPath)) {
-      throw new Error(`${emailAuthR1csPath} does not exist.`);
-    }
-    await generateKeys(phase1Path, emailAuthR1csPath, path.join(buildDir, "email_auth_with_body_parsing_with_qp_encoding.zkey"), path.join(buildDir, "email_auth_with_body_parsing_with_qp_encoding.vkey"), path.join(buildDir, "Groth16BodyParsingVerifier.sol"));
-    log("✓ Keys for email auth with body parsing circuit generated");
+  if (!fs.existsSync(circuitPath)) {
+    throw new Error(`Circuit file does not exist at path: ${circuitPath}`);
   }
 
+  const phase1Path = path.join(buildDir, args.body ? "powersOfTau28_hez_final_23.ptau" : "powersOfTau28_hez_final_22.ptau");
+
+  await downloadPhase1(phase1Path);
+  log("✓ Phase 1:", phase1Path);
+
+  const zKeyPath = path.join(buildDir, `${circuitName}.zkey`);
+  const vKeyPath = path.join(buildDir, `${circuitName}_vkey.json`);
+  const solidityVerifierPath = path.join(buildDir, `${circuitName}_verifier.sol`);
+
+  await generateKeys(phase1Path, circuitPath, zKeyPath, vKeyPath, solidityVerifierPath);
+  log("✓ Keys for circuit generated");
 }
 
 

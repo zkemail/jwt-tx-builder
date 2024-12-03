@@ -1,5 +1,5 @@
 {
-    "name": "@zk-jwt/zk-jwt-circuits",
+    "name": "@zk-email/jwt-tx-builder-circuits",
     "version": "0.0.1",
     "license": "MIT",
     "scripts": {
@@ -39,7 +39,8 @@
         "/lib",
         "/utils",
         "/scripts",
-        "./jwt-verifier.circom"
+        "./jwt-verifier.circom",
+        "./jwt-auth.circom"
     ],
     "babel": {
         "presets": [

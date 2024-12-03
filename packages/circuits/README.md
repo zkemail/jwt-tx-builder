@@ -1,4 +1,4 @@
-# @zk-jwt/circuits
+# @zk-email/jwt-tx-builder-circuits
 
 The `circuits` package exports the circom circuits needed for building on ZK-JWT.
 
@@ -7,19 +7,19 @@ All circuits in this package are libraries that can be imported to your circom p
 ## Installation
 
 ```bash
-yarn add @zk-jwt/circuits
+yarn add @zk-email/jwt-tx-builder-circuits
 ```
 
-## JWTVerifier Circuit
+## JWT Auth Circuit
 
-The [JWTVerifier](./jwt-verifier-template.circom) circuit is the core circuit for verifying JWT signatures. It is used to verify the signature of a JWT token and to verify the issuer and audience claims.
+The [JWT Auth](./jwt-auth.circom) circuit is the core circuit for verifying JWT signatures and actions using the JWT Auth protocol.
 
 ### Usage
 
 Import to your circuit file like below.
 
 ```circom
-include "@zk-jwt/circuits/jwt-verifier-template.circom";
+include "@zk-email/jwt-tx-builder-circuits/jwt-auth.circom";
 ```
 
 -   Parameters:
@@ -42,7 +42,6 @@ include "@zk-jwt/circuits/jwt-verifier-template.circom";
     -   `accountCode`: The account code. (Used in the context of a `jwt-wallet` to identify the smart wallet)
     -   `codeIndex`: The index of the "account code" in the "command".
     -   `periodIndex`: The index of the period in the JWT message.
-    -   `jwtTypStartIndex`: The index of the "typ" in the JWT header.
     -   `jwtKidStartIndex`: The index of the "kid" in the JWT header.
     -   `issKeyStartIndex`: The index of the "iss" key in the JWT payload.
     -   `issLength`: The length of the "iss" claim in the JWT payload.
