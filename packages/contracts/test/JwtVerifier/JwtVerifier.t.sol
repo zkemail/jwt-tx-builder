@@ -43,7 +43,7 @@ contract JwtVerifierTest_verifyjwtProof is Test {
             address(verifierImpl),
             abi.encodeCall(
                 verifierImpl.initialize,
-                (msg.sender, address(groth16Verifier), address(jwtRegistry))
+                (msg.sender, address(groth16Verifier))
             )
         );
         verifier = JwtVerifier(address(verifierProxy));

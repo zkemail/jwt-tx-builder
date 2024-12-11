@@ -6,16 +6,17 @@ import "forge-std/Script.sol";
 import "../src/utils/JwtRegistry.sol";
 import "../src/utils/JwtVerifier.sol";
 import "../src/utils/JwtGroth16Verifier.sol";
+import "../src/JwtAuth.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 // 1. `source .env`
-// 2. `forge script script/Deploy_jwtVerifier.s.sol:DeployScript --rpc-url $RPC_URL --verify --etherscan-api-key $ETHERSCAN_API_KEY --broadcast -vvvv`
+// 2. `forge script script/Deploy_jwtAuth.s.sol:DeployScript --rpc-url $RPC_URL --verify --etherscan-api-key $ETHERSCAN_API_KEY --broadcast -vvvv`
 contract DeployScript is Script {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
         address deployer = vm.addr(deployerPrivateKey);
-        address initialOwner = deployer;
         bytes32 salt = keccak256(abi.encodePacked(vm.envString("DEPLOY_SALT")));
+        address initialOwner = deployer;
 
         vm.startBroadcast(deployerPrivateKey);
 
@@ -38,8 +39,23 @@ contract DeployScript is Script {
             )
         );
 
-        JwtVerifier jwtVerifier = JwtVerifier(address(jwtVerifierProxy));
-        console.log("JWTVerifier proxy deployed to:", address(jwtVerifier));
+        JwtVerifier verifier = JwtVerifier(address(jwtVerifierProxy));
+        console.log("JWTVerifier proxy deployed to:", address(verifier));
+
+        JwtAuth authImpl = new JwtAuth();
+        ERC1967Proxy authProxy = new ERC1967Proxy(
+            address(authImpl),
+            abi.encodeCall(authImpl.initialize, (deployer))
+        );
+        JwtAuth jwtAuth = JwtAuth(address(authProxy));
+        console.log("JwtAuth proxy deployed to:", address(jwtAuth));
+
+        jwtAuth.initJwtRegistry(address(jwtRegistry));
+        console.log("JwtRegistry address has been set in JwtAuth");
+        jwtAuth.initVerifier(address(verifier));
+        console.log("JwtVerifier address has been set in JwtAuth");
+        jwtRegistry.updateJwtAuth(address(jwtAuth));
+        console.log("JwtAuth address has been updated in JwtRegistry");
 
         vm.stopBroadcast();
     }

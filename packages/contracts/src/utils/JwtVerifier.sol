@@ -16,7 +16,6 @@ contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
     using StringToArrayUtils for string;
 
     IJwtGroth16Verifier groth16Verifier;
-    JwtRegistry jwtRegistry;
 
     uint256 public constant ISS_FIELDS = 2;
     uint256 public constant ISS_BYTES = 32;
@@ -29,17 +28,16 @@ contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
 
     /// @notice Initialize the contract with the initial owner and deploy Groth16Verifier
     /// @param _initialOwner The address of the initial owner
+    /// @param _groth16Verifier The address of the gorth16Verifier
     function initialize(
         address _initialOwner,
-        address _groth16Verifier,
-        address _jwtRegistry
+        address _groth16Verifier
     ) public initializer {
         __Ownable_init(_initialOwner);
         groth16Verifier = IJwtGroth16Verifier(_groth16Verifier);
-        jwtRegistry = JwtRegistry(_jwtRegistry);
     }
 
-    function verifyJwtProof(JwtProof memory proof) public returns (bool) {
+    function verifyJwtProof(JwtProof memory proof) public view returns (bool) {
         (
             uint256[2] memory pA,
             uint256[2][2] memory pB,
@@ -90,30 +88,6 @@ contract JwtVerifier is IVerifier, OwnableUpgradeable, UUPSUpgradeable {
             .isCodeExist
             ? 1
             : 0;
-
-        // Check JwtRegistry, 
-        // if it returns false, then call updateJwtRegistry, 
-        // and then try isJwtPublicKeyValid again.
-        if (
-            !jwtRegistry.isJwtPublicKeyValid(
-                proof.domainName,
-                proof.publicKeyHash
-            )
-        ) {
-            jwtRegistry.updateJwtRegistry();
-            require(
-                jwtRegistry.isJwtPublicKeyValid(
-                    proof.domainName,
-                    proof.publicKeyHash
-                ),
-                "Invalid public key hash"
-            );
-        }
-        // Check if azp is in whitelist
-        require(
-            jwtRegistry.isAzpWhitelisted(proof.azp),
-            "azp is not whitelisted"
-        );
 
         return groth16Verifier.verifyProof(pA, pB, pC, pubSignals);
     }
